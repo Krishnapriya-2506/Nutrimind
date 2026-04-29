@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Search, ArrowRight, Zap, Target, Flame, CheckCircle } from "lucide-react"
+import { Search, ArrowRight, Zap, Target, Flame } from "lucide-react"
 
 import { useAuth } from "@/contexts/AuthContext"
 

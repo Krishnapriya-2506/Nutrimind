@@ -1,17 +1,16 @@
 import { useMemo } from "react"
-import { motion, AnimatePresence } from "motion/react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useUserStats } from "@/contexts/UserStatsContext"
 import { 
-  Activity, Brain, TrendingUp, AlertCircle, Apple, 
-  Target, Zap, Flame, Clock, Heart, ArrowUpRight,
+  Brain, AlertCircle, 
+  Target, Zap, Clock, Heart,
   ShieldCheck, BrainCircuit, Sparkles, MessageSquare,
-  CheckCircle2, XCircle, BarChart3, LineChart
+  CheckCircle2, XCircle, LineChart
 } from "lucide-react"
 
 export default function ReportTab() {
-  const { stats, getPatterns } = useUserStats()
+  const { stats } = useUserStats()
   
   const aiReport = useMemo(() => {
     try {
