@@ -34,6 +34,7 @@ type UserStatsContextType = {
   confirmJunkFreeDay: () => void
   getPatterns: () => Array<{ pattern: string; frequency: number }>
   predictCraving: () => { timeLabel: string; cravedItem: string | undefined; suggestion: string }
+  addPoints: (amount: number) => void
 }
 
 const defaultStats: UserStats = {
@@ -210,8 +211,15 @@ export function UserStatsProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const addPoints = (amount: number) => {
+    saveStats({
+      ...stats,
+      points: stats.points + amount
+    })
+  }
+
   return (
-    <UserStatsContext.Provider value={{ stats, logHealthyChoice, confirmJunkFreeDay, getPatterns, predictCraving }}>
+    <UserStatsContext.Provider value={{ stats, logHealthyChoice, confirmJunkFreeDay, getPatterns, predictCraving, addPoints }}>
       {children}
     </UserStatsContext.Provider>
   )

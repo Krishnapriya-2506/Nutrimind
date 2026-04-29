@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Search, ArrowRight, Zap, Target, Flame } from "lucide-react"
+import { Search, ArrowRight, Zap, Target, Flame, Sparkles } from "lucide-react"
 
 import { useAuth } from "@/contexts/AuthContext"
 
@@ -14,88 +14,59 @@ type Substitution = {
   healthy: string
   healthyCals: number
   benefits: string[]
+  tags: string[]
 }
 
 const SUBSTITUTIONS_DB: Substitution[] = [
-  { junk: "Pizza", junkCals: 800, healthy: "Whole wheat veggie pizza", healthyCals: 450, benefits: ["More fiber", "Less refined flour", "Lower glycemic index"] },
-  { junk: "Burger", junkCals: 650, healthy: "Whole wheat veggie burger", healthyCals: 380, benefits: ["Less fat", "More nutrients", "High fiber"] },
-  { junk: "French fries", junkCals: 450, healthy: "Baked sweet potato fries", healthyCals: 200, benefits: ["Less oil", "More vitamins", "Vitamin A rich"] },
-  { junk: "Potato chips", junkCals: 400, healthy: "Roasted makhana", healthyCals: 120, benefits: ["Low fat", "High fiber", "Rich in minerals"] },
-  { junk: "Soft drinks", junkCals: 150, healthy: "Fresh fruit juice", healthyCals: 60, benefits: ["Natural sugars", "Vitamins", "Antioxidants"] },
-  { junk: "Ice cream", junkCals: 350, healthy: "Frozen yogurt", healthyCals: 180, benefits: ["Lower fat", "Probiotics", "Digestive health"] },
-  { junk: "Chocolate bar", junkCals: 250, healthy: "Dark chocolate (70%)", healthyCals: 150, benefits: ["Less sugar", "Antioxidants", "Mood booster"] },
-  { junk: "Milkshake", junkCals: 400, healthy: "Banana smoothie", healthyCals: 220, benefits: ["Natural sweetness", "Potassium", "No added sugar"] },
-  { junk: "White bread", junkCals: 150, healthy: "Whole wheat bread", healthyCals: 110, benefits: ["More fiber", "Better digestion"] },
-  { junk: "Instant noodles", junkCals: 450, healthy: "Whole wheat noodles with veggies", healthyCals: 280, benefits: ["More nutrients", "Complex carbs"] },
-  { junk: "Fried chicken", junkCals: 600, healthy: "Grilled paneer or tofu", healthyCals: 250, benefits: ["Less oil", "High protein", "Lean muscle fuel"] },
-  { junk: "Fried rice", junkCals: 550, healthy: "Brown rice veggie bowl", healthyCals: 320, benefits: ["High fiber", "Stable energy"] },
-  { junk: "Sugary cereal", junkCals: 220, healthy: "Oats with fruits", healthyCals: 180, benefits: ["Low sugar", "High fiber", "Heart healthy"] },
-  { junk: "Candy", junkCals: 200, healthy: "Dates or dry fruits", healthyCals: 120, benefits: ["Natural sugar", "Iron rich", "Fiber"] },
-  { junk: "Donuts", junkCals: 350, healthy: "Baked whole wheat muffins", healthyCals: 160, benefits: ["Less oil", "Whole grain goodness"] },
-  { junk: "Cake", junkCals: 400, healthy: "Banana oat cake", healthyCals: 210, benefits: ["No refined sugar", "Fiber rich"] },
-  { junk: "Biscuits", junkCals: 180, healthy: "Oats cookies", healthyCals: 120, benefits: ["More fiber", "Satisfying crunch"] },
-  { junk: "Nachos", junkCals: 480, healthy: "Baked tortilla chips", healthyCals: 240, benefits: ["Less fat", "Whole grain corn"] },
-  { junk: "Cheese dip", junkCals: 300, healthy: "Hummus", healthyCals: 150, benefits: ["Healthy fats", "Plant protein"] },
-  { junk: "Mayonnaise", junkCals: 100, healthy: "Greek yogurt dip", healthyCals: 40, benefits: ["High protein", "Low fat"] },
-  { junk: "Cream pasta", junkCals: 700, healthy: "Whole wheat pasta with veggies", healthyCals: 350, benefits: ["Less fat", "Complex carbs", "Vitamin rich"] },
-  { junk: "Butter naan", junkCals: 350, healthy: "Chapati", healthyCals: 120, benefits: ["Less fat", "Easier to digest"] },
-  { junk: "Sugary coffee", junkCals: 250, healthy: "Black coffee with little jaggery", healthyCals: 40, benefits: ["Less sugar", "Metabolism boost"] },
-  { junk: "Energy drinks", junkCals: 180, healthy: "Coconut water", healthyCals: 45, benefits: ["Natural electrolytes", "Hydrating"] },
-  { junk: "Packaged juice", junkCals: 140, healthy: "Fresh juice", healthyCals: 80, benefits: ["No preservatives", "Maximum vitamins"] },
-  { junk: "Fried snacks", junkCals: 400, healthy: "Air-fried snacks", healthyCals: 180, benefits: ["Less oil", "Same crunch"] },
-  { junk: "Samosa", junkCals: 300, healthy: "Baked samosa", healthyCals: 150, benefits: ["Low oil", "Spices for metabolism"] },
-  { junk: "Pakora", junkCals: 350, healthy: "Grilled veggie bites", healthyCals: 120, benefits: ["Less fat", "Nutrient dense"] },
-  { junk: "Pani puri", junkCals: 250, healthy: "Sprouts chaat", healthyCals: 140, benefits: ["High protein", "Less refined flour"] },
-  { junk: "Chaat", junkCals: 350, healthy: "Fruit chaat", healthyCals: 120, benefits: ["More vitamins", "Natural freshness"] },
-  { junk: "Fried eggs", junkCals: 250, healthy: "Boiled eggs", healthyCals: 140, benefits: ["Less oil", "Pure protein"] },
-  { junk: "Butter toast", junkCals: 220, healthy: "Peanut butter toast", healthyCals: 180, benefits: ["Healthy fats", "High satiety"] },
-  { junk: "Chocolate spread", junkCals: 190, healthy: "Peanut butter", healthyCals: 100, benefits: ["More protein", "Healthy oils"] },
-  { junk: "Sweetened yogurt", junkCals: 160, healthy: "Plain yogurt with fruits", healthyCals: 110, benefits: ["Less sugar", "Natural vitamins"] },
-  { junk: "White rice", junkCals: 240, healthy: "Brown rice", healthyCals: 210, benefits: ["More fiber", "Lower GI"] },
-  { junk: "Fried fish", junkCals: 450, healthy: "Grilled fish", healthyCals: 220, benefits: ["Less oil", "Omega-3 preservation"] },
-  { junk: "Sugary tea", junkCals: 120, healthy: "Green tea", healthyCals: 2, benefits: ["Antioxidants", "Zero calories"] },
-  { junk: "Cream biscuits", junkCals: 240, healthy: "Whole grain biscuits", healthyCals: 140, benefits: ["Less sugar", "More fiber"] },
-  { junk: "Butter popcorn", junkCals: 350, healthy: "Air-popped popcorn", healthyCals: 120, benefits: ["Low fat", "High volume"] },
-  { junk: "Chocolate milk", junkCals: 220, healthy: "Almond milk", healthyCals: 60, benefits: ["Low sugar", "Vitamin E"] },
-  { junk: "Sugary smoothies", junkCals: 350, healthy: "No-sugar fruit smoothies", healthyCals: 180, benefits: ["Natural sugars", "Maximum fiber"] },
-  { junk: "Fried paneer", junkCals: 400, healthy: "Grilled paneer", healthyCals: 250, benefits: ["Less oil", "High protein"] },
-  { junk: "Heavy biryani", junkCals: 750, healthy: "Vegetable pulao", healthyCals: 380, benefits: ["Light digestion", "Lower fat"] },
-  { junk: "Butter chicken", junkCals: 650, healthy: "Paneer curry", healthyCals: 350, benefits: ["Less fat", "Balanced spices"] },
-  { junk: "Cola", junkCals: 150, healthy: "Lemon water", healthyCals: 15, benefits: ["Hydration", "Vitamin C boost"] },
-  { junk: "Sugary desserts", junkCals: 450, healthy: "Fruit bowl", healthyCals: 120, benefits: ["Natural sugars", "Full of fiber"] },
-  { junk: "Ice cream shake", junkCals: 550, healthy: "Fruit smoothie", healthyCals: 220, benefits: ["Low fat", "Natural nutrients"] },
-  { junk: "Deep fried snacks", junkCals: 400, healthy: "Roasted snacks", healthyCals: 140, benefits: ["Less oil", "Heart healthy"] },
-  { junk: "Instant soup", junkCals: 180, healthy: "Homemade vegetable soup", healthyCals: 90, benefits: ["No preservatives", "Low sodium"] },
-  { junk: "White pasta", junkCals: 500, healthy: "Millet pasta", healthyCals: 280, benefits: ["More nutrients", "Gluten-free option"] },
-  { junk: "Fried noodles", junkCals: 550, healthy: "Stir-fried whole wheat noodles", healthyCals: 320, benefits: ["Less oil", "More veggies"] },
-  { junk: "Sugary drinks", junkCals: 140, healthy: "Herbal tea", healthyCals: 5, benefits: ["Relaxation", "Calming effect"] },
-  { junk: "Candy bars", junkCals: 280, healthy: "Dark chocolate", healthyCals: 160, benefits: ["Less sugar", "Polyphenols"] },
-  { junk: "Heavy sandwiches", junkCals: 550, healthy: "Veg sandwich (whole wheat)", healthyCals: 280, benefits: ["Healthy carbs", "More fiber"] },
-  { junk: "Fried corn", junkCals: 250, healthy: "Boiled corn", healthyCals: 100, benefits: ["Low fat", "Natural sweetness"] },
-  { junk: "Sugary snacks", junkCals: 300, healthy: "Dry fruits", healthyCals: 150, benefits: ["Natural energy", "Healthy fats"] },
-  { junk: "Fried cutlets", junkCals: 350, healthy: "Baked cutlets", healthyCals: 180, benefits: ["Less oil", "Clean protein"] },
-  { junk: "Sugary cereal bars", junkCals: 220, healthy: "Energy balls", healthyCals: 130, benefits: ["No preservatives", "Nutrient dense"] },
-  { junk: "Sugary milk drinks", junkCals: 180, healthy: "Turmeric milk", healthyCals: 110, benefits: ["Immunity", "Anti-inflammatory"] },
-  { junk: "Heavy gravies", junkCals: 450, healthy: "Light vegetable curry", healthyCals: 200, benefits: ["Less fat", "Easier digestion"] },
-  { junk: "Fried snacks mix", junkCals: 450, healthy: "Roasted trail mix", healthyCals: 180, benefits: ["Healthy fats", "Omega-3s"] },
-  { junk: "Sugary pancakes", junkCals: 400, healthy: "Oats pancakes", healthyCals: 220, benefits: ["More fiber", "Stable energy"] },
-  { junk: "White flour snacks", junkCals: 350, healthy: "Whole wheat snacks", healthyCals: 190, benefits: ["Better digestion", "Complex carbs"] },
-  { junk: "Fried dosa", junkCals: 380, healthy: "Plain dosa (less oil)", healthyCals: 210, benefits: ["Less fat", "Fermented benefits"] },
-  { junk: "Sugary milkshake", junkCals: 450, healthy: "Protein smoothie", healthyCals: 250, benefits: ["Balanced nutrition", "Muscle support"] },
-  { junk: "Sugary sweets", junkCals: 300, healthy: "Dates-based sweets", healthyCals: 140, benefits: ["Natural sugar", "Iron boost"] },
-  { junk: "Fried rice snacks", junkCals: 250, healthy: "Puffed rice snack", healthyCals: 90, benefits: ["Low fat", "Light snack"] },
-  { junk: "Sugary custard", junkCals: 280, healthy: "Greek yogurt with fruits", healthyCals: 150, benefits: ["High protein", "Probiotics"] },
-  { junk: "Heavy cheese pizza", junkCals: 900, healthy: "Thin crust veggie pizza", healthyCals: 420, benefits: ["Less calories", "High volume"] },
-  { junk: "Fried rolls", junkCals: 450, healthy: "Grilled wraps", healthyCals: 280, benefits: ["Less oil", "Whole grain wrap"] },
-  { junk: "Chicken biriyani", junkCals: 750, healthy: "Brown rice chicken biriyani (low oil, more veggies)", healthyCals: 450, benefits: ["Less oil", "higher fiber", "easier digestion"] },
-  { junk: "Mutton biriyani", junkCals: 850, healthy: "Millet mutton biriyani (small portion, low oil)", healthyCals: 500, benefits: ["Lower fat load", "better for digestion"] },
-  { junk: "Beef biriyani", junkCals: 800, healthy: "Vegetable or paneer biriyani (less oil)", healthyCals: 400, benefits: ["Lower saturated fat", "lighter meal"] },
-  { junk: "Mutton soup (oily)", junkCals: 350, healthy: "Clear mutton soup (low fat, skimmed)", healthyCals: 180, benefits: ["Less fat", "still rich in nutrients"] },
-  { junk: "Chicken fry", junkCals: 550, healthy: "Grilled or air-fried chicken (less oil)", healthyCals: 280, benefits: ["Reduced oil", "better heart health"] },
-  { junk: "Chicken 65", junkCals: 450, healthy: "Air-fried chicken 65 (minimal oil)", healthyCals: 180, benefits: ["Same taste", "less deep frying"] },
-  { junk: "Chicken momos (fried)", junkCals: 400, healthy: "Steamed chicken momos", healthyCals: 220, benefits: ["No deep frying", "lighter digestion"] },
-  { junk: "Chicken fried rice", junkCals: 600, healthy: "Brown rice chicken stir-fry (less oil, more veggies)", healthyCals: 350, benefits: ["More fiber", "balanced nutrients"] },
-  { junk: "Atho (oily street style)", junkCals: 500, healthy: "Homemade atho with less oil + more cabbage", healthyCals: 250, benefits: ["Less oil", "more fiber", "hygienic"] }
+  { junk: "Pizza", junkCals: 800, healthy: "Whole wheat veggie pizza", healthyCals: 450, benefits: ["More fiber", "Less refined flour", "Lower glycemic index"], tags: ["savory", "creamy", "meal", "evening"] },
+  { junk: "Burger", junkCals: 650, healthy: "Whole wheat veggie burger", healthyCals: 380, benefits: ["Less fat", "More nutrients", "High fiber"], tags: ["savory", "meal", "afternoon"] },
+  { junk: "French fries", junkCals: 450, healthy: "Baked sweet potato fries", healthyCals: 200, benefits: ["Less oil", "More vitamins", "Vitamin A rich"], tags: ["savory", "salty", "snack", "afternoon"] },
+  { junk: "Potato chips", junkCals: 400, healthy: "Roasted makhana", healthyCals: 120, benefits: ["Low fat", "High fiber", "Rich in minerals"], tags: ["salty", "crunchy", "snack", "afternoon", "bored"] },
+  { junk: "Soft drinks", junkCals: 150, healthy: "Fresh fruit juice", healthyCals: 60, benefits: ["Natural sugars", "Vitamins", "Antioxidants"], tags: ["sweet", "liquid", "afternoon"] },
+  { junk: "Ice cream", junkCals: 350, healthy: "Frozen yogurt", healthyCals: 180, benefits: ["Lower fat", "Probiotics", "Digestive health"], tags: ["sweet", "creamy", "dessert", "night", "stressed"] },
+  { junk: "Chocolate bar", junkCals: 250, healthy: "Dark chocolate (70%)", healthyCals: 150, benefits: ["Less sugar", "Antioxidants", "Mood booster"], tags: ["sweet", "snack", "evening", "stressed"] },
+  { junk: "Milkshake", junkCals: 400, healthy: "Banana smoothie", healthyCals: 220, benefits: ["Natural sweetness", "Potassium", "No added sugar"], tags: ["sweet", "creamy", "liquid", "morning"] },
+  { junk: "White bread", junkCals: 150, healthy: "Whole wheat bread", healthyCals: 110, benefits: ["More fiber", "Better digestion"], tags: ["savory", "morning", "meal"] },
+  { junk: "Instant noodles", junkCals: 450, healthy: "Whole wheat noodles with veggies", healthyCals: 280, benefits: ["More nutrients", "Complex carbs"], tags: ["savory", "spicy", "meal", "night", "bored"] },
+  { junk: "Fried chicken", junkCals: 600, healthy: "Grilled paneer or tofu", healthyCals: 250, benefits: ["Less oil", "High protein", "Lean muscle fuel"], tags: ["savory", "spicy", "protein", "meal", "evening"] },
+  { junk: "Fried rice", junkCals: 550, healthy: "Brown rice veggie bowl", healthyCals: 320, benefits: ["High fiber", "Stable energy"], tags: ["savory", "meal", "afternoon"] },
+  { junk: "Sugary cereal", junkCals: 220, healthy: "Oats with fruits", healthyCals: 180, benefits: ["Low sugar", "High fiber", "Heart healthy"], tags: ["sweet", "morning", "meal"] },
+  { junk: "Candy", junkCals: 200, healthy: "Dates or dry fruits", healthyCals: 120, benefits: ["Natural sugar", "Iron rich", "Fiber"], tags: ["sweet", "snack", "afternoon", "bored"] },
+  { junk: "Donuts", junkCals: 350, healthy: "Baked whole wheat muffins", healthyCals: 160, benefits: ["Less oil", "Whole grain goodness"], tags: ["sweet", "morning", "snack"] },
+  { junk: "Cake", junkCals: 400, healthy: "Banana oat cake", healthyCals: 210, benefits: ["No refined sugar", "Fiber rich"], tags: ["sweet", "dessert", "evening"] },
+  { junk: "Biscuits", junkCals: 180, healthy: "Oats cookies", healthyCals: 120, benefits: ["More fiber", "Satisfying crunch"], tags: ["sweet", "snack", "evening"] },
+  { junk: "Nachos", junkCals: 480, healthy: "Baked tortilla chips", healthyCals: 240, benefits: ["Less fat", "Whole grain corn"], tags: ["savory", "crunchy", "snack", "night"] },
+  { junk: "Cheese dip", junkCals: 300, healthy: "Hummus", healthyCals: 150, benefits: ["Healthy fats", "Plant protein"], tags: ["creamy", "savory", "snack", "afternoon"] },
+  { junk: "Mayonnaise", junkCals: 100, healthy: "Greek yogurt dip", healthyCals: 40, benefits: ["High protein", "Low fat"], tags: ["creamy", "savory", "afternoon"] },
+  { junk: "Cream pasta", junkCals: 700, healthy: "Whole wheat pasta with veggies", healthyCals: 350, benefits: ["Less fat", "Complex carbs", "Vitamin rich"], tags: ["creamy", "savory", "meal", "night", "stressed"] },
+  { junk: "Butter naan", junkCals: 350, healthy: "Chapati", healthyCals: 120, benefits: ["Less fat", "Easier to digest"], tags: ["savory", "meal", "night"] },
+  { junk: "Sugary coffee", junkCals: 250, healthy: "Black coffee with little jaggery", healthyCals: 40, benefits: ["Less sugar", "Metabolism boost"], tags: ["sweet", "liquid", "morning"] },
+  { junk: "Energy drinks", junkCals: 180, healthy: "Coconut water", healthyCals: 45, benefits: ["Natural electrolytes", "Hydrating"], tags: ["liquid", "afternoon"] },
+  { junk: "Samosa", junkCals: 300, healthy: "Baked samosa", healthyCals: 150, benefits: ["Low oil", "Spices for metabolism"], tags: ["spicy", "savory", "snack", "evening"] },
+  { junk: "Pakora", junkCals: 350, healthy: "Grilled veggie bites", healthyCals: 120, benefits: ["Less fat", "Nutrient dense"], tags: ["spicy", "savory", "snack", "evening", "stressed"] },
+  { junk: "Pani puri", junkCals: 250, healthy: "Sprouts chaat", healthyCals: 140, benefits: ["High protein", "Less refined flour"], tags: ["spicy", "savory", "snack", "evening"] },
+  { junk: "Chaat", junkCals: 350, healthy: "Fruit chaat", healthyCals: 120, benefits: ["More vitamins", "Natural freshness"], tags: ["sweet", "spicy", "snack", "afternoon"] },
+  { junk: "White rice", junkCals: 240, healthy: "Brown rice", healthyCals: 210, benefits: ["More fiber", "Lower GI"], tags: ["savory", "meal", "afternoon"] },
+  { junk: "Fried fish", junkCals: 450, healthy: "Grilled fish", healthyCals: 220, benefits: ["Less oil", "Omega-3 preservation"], tags: ["savory", "protein", "meal", "night"] },
+  { junk: "Sugary tea", junkCals: 120, healthy: "Green tea", healthyCals: 2, benefits: ["Antioxidants", "Zero calories"], tags: ["liquid", "morning", "evening"] },
+  { junk: "Cream biscuits", junkCals: 240, healthy: "Whole grain biscuits", healthyCals: 140, benefits: ["Less sugar", "More fiber"], tags: ["sweet", "creamy", "snack", "evening"] },
+  { junk: "Butter popcorn", junkCals: 350, healthy: "Air-popped popcorn", healthyCals: 120, benefits: ["Low fat", "High volume"], tags: ["salty", "snack", "night", "bored"] },
+  { junk: "Fried paneer", junkCals: 400, healthy: "Grilled paneer", healthyCals: 250, benefits: ["Less oil", "High protein"], tags: ["creamy", "savory", "protein", "evening"] },
+  { junk: "Heavy biryani", junkCals: 750, healthy: "Vegetable pulao", healthyCals: 380, benefits: ["Light digestion", "Lower fat"], tags: ["savory", "spicy", "meal", "afternoon"] },
+  { junk: "Butter chicken", junkCals: 650, healthy: "Paneer curry", healthyCals: 350, benefits: ["Less fat", "Balanced spices"], tags: ["creamy", "savory", "spicy", "meal", "night"] },
+  { junk: "Cola", junkCals: 150, healthy: "Lemon water", healthyCals: 15, benefits: ["Hydration", "Vitamin C boost"], tags: ["liquid", "afternoon"] },
+  { junk: "Fried noodles", junkCals: 550, healthy: "Stir-fried whole wheat noodles", healthyCals: 320, benefits: ["Less oil", "More veggies"], tags: ["savory", "spicy", "meal", "night"] },
+  { junk: "Candy bars", junkCals: 280, healthy: "Dark chocolate", healthyCals: 160, benefits: ["Less sugar", "Polyphenols"], tags: ["sweet", "snack", "evening", "stressed"] },
+  { junk: "Fried corn", junkCals: 250, healthy: "Boiled corn", healthyCals: 100, benefits: ["Low fat", "Natural sweetness"], tags: ["sweet", "snack", "afternoon"] },
+  { junk: "Fried cutlets", junkCals: 350, healthy: "Baked cutlets", healthyCals: 180, benefits: ["Less oil", "Clean protein"], tags: ["savory", "spicy", "snack", "evening"] },
+  { junk: "Sugary pancakes", junkCals: 400, healthy: "Oats pancakes", healthyCals: 220, benefits: ["More fiber", "Stable energy"], tags: ["sweet", "morning", "meal"] },
+  { junk: "Fried dosa", junkCals: 380, healthy: "Plain dosa (less oil)", healthyCals: 210, benefits: ["Less fat", "Fermented benefits"], tags: ["savory", "morning", "meal"] },
+  { junk: "Sugary milkshake", junkCals: 450, healthy: "Protein smoothie", healthyCals: 250, benefits: ["Balanced nutrition", "Muscle support"], tags: ["sweet", "creamy", "protein", "morning"] },
+  { junk: "Sugary custard", junkCals: 280, healthy: "Greek yogurt with fruits", healthyCals: 150, benefits: ["High protein", "Probiotics"], tags: ["sweet", "creamy", "dessert", "night"] },
+  { junk: "Chicken biriyani", junkCals: 750, healthy: "Brown rice chicken biriyani", healthyCals: 450, benefits: ["Less oil", "Higher fiber"], tags: ["savory", "spicy", "meal", "afternoon"] },
+  { junk: "Chicken 65", junkCals: 450, healthy: "Air-fried chicken 65", healthyCals: 180, benefits: ["Same taste", "Less deep frying"], tags: ["spicy", "savory", "snack", "evening", "stressed"] },
+  { junk: "Chicken momos (fried)", junkCals: 400, healthy: "Steamed chicken momos", healthyCals: 220, benefits: ["No deep frying", "Lighter digestion"], tags: ["savory", "spicy", "snack", "evening"] },
+  { junk: "Atho", junkCals: 500, healthy: "Homemade atho (Less oil)", healthyCals: 250, benefits: ["Less oil", "More fiber"], tags: ["spicy", "savory", "meal", "evening"] }
 ]
 
 const getEmoji = (name: string) => {
@@ -118,6 +89,26 @@ export default function SubstitutionsTab() {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<Substitution[]>([])
   const [hasSearched, setHasSearched] = useState(false)
+  const [selectedTaste, setSelectedTaste] = useState<string | null>(null)
+
+  const getTimeOfDay = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return "morning"
+    if (hour < 17) return "afternoon"
+    if (hour < 21) return "evening"
+    return "night"
+  }
+
+  const getSmartRecommendations = () => {
+    const time = getTimeOfDay()
+    
+    return SUBSTITUTIONS_DB.filter(s => {
+      const matchesTime = s.tags.includes(time)
+      const matchesTaste = selectedTaste ? s.tags.includes(selectedTaste.toLowerCase()) : true
+      
+      return matchesTime && matchesTaste
+    }).slice(0, 4)
+  }
 
   const applyGoalToSubstitution = (sub: Substitution): Substitution => {
     const goal = user?.goal || "Balanced Diet"
@@ -159,7 +150,8 @@ export default function SubstitutionsTab() {
         junkCals: 500,
         healthy: "Homemade " + query.trim() + " (Less Oil)",
         healthyCals: 300,
-        benefits: ["Personalized Choice", "Fresh Ingredients", "Nutrient Dense"]
+        benefits: ["Personalized Choice", "Fresh Ingredients", "Nutrient Dense"],
+        tags: ["custom", "savory"]
       }]
     }
     
@@ -169,48 +161,119 @@ export default function SubstitutionsTab() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-gradient-to-r from-primary/10 to-transparent border-primary/20 shadow-sm overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-        <CardContent className="p-8">
-          <div className="text-center max-w-2xl mx-auto space-y-4">
-            <div className="inline-flex p-3 rounded-2xl bg-primary/10 mb-2">
-              <Target className="w-8 h-8 text-primary" />
-            </div>
-            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-600">Smart Substitutions</h2>
-            <p className="text-muted-foreground">Craving something? Let's find a realistic, healthier version together.</p>
-            
-            <div className="flex gap-2 max-w-md mx-auto pt-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input 
-                  placeholder="e.g., Pizza, Biriyani, Chicken 65..." 
-                  className="h-12 pl-10 text-base bg-background shadow-sm border-primary/20 focus-visible:ring-primary"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                />
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+        <Card className="bg-gradient-to-br from-primary/20 via-background to-emerald-500/10 border-primary/20 shadow-2xl overflow-hidden relative backdrop-blur-xl">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -mr-32 -mt-32 blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+          
+          <CardContent className="p-10 relative z-10">
+            <div className="text-center max-w-2xl mx-auto space-y-6">
+              <motion.div 
+                initial={{ rotate: -10 }} 
+                animate={{ rotate: 0 }}
+                className="inline-flex p-4 rounded-3xl bg-primary/10 mb-2 shadow-inner ring-1 ring-primary/20"
+              >
+                <Target className="w-10 h-10 text-primary" />
+              </motion.div>
+              
+              <div className="space-y-2">
+                <h2 className="text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-emerald-600 to-primary/80">
+                  Smart Substitutions
+                </h2>
+                <p className="text-muted-foreground font-medium text-lg">Craving something? Let's find a realistic, healthier version together.</p>
               </div>
-              <Button size="lg" className="h-12 px-8 font-bold bg-primary hover:bg-primary/90" onClick={handleSearch}>
-                Find
-              </Button>
+              
+              <div className="flex gap-3 max-w-lg mx-auto pt-4">
+                <div className="relative flex-1 group">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input 
+                    placeholder="e.g., Pizza, Biriyani, Chicken 65..." 
+                    className="h-14 pl-12 text-lg bg-background/80 backdrop-blur-sm shadow-lg border-primary/20 focus-visible:ring-primary rounded-2xl transition-all"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  />
+                </div>
+                <Button size="lg" className="h-14 px-10 font-black text-lg bg-primary hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 active:scale-95 transition-all" onClick={handleSearch}>
+                  Find
+                </Button>
+              </div>
+
+              <div className="flex flex-col gap-5 items-center pt-6">
+                <div className="flex flex-wrap justify-center gap-3">
+                  <span className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] self-center mr-2 opacity-50">Filter by Taste</span>
+                  {['Spicy', 'Sweet', 'Creamy', 'Savory'].map(taste => (
+                    <Badge 
+                      key={taste} 
+                      variant={selectedTaste === taste ? "default" : "outline"}
+                      className={`cursor-pointer font-black px-4 py-1.5 rounded-full transition-all hover:scale-110 active:scale-90 border-primary/20 ${selectedTaste === taste ? 'shadow-lg shadow-primary/30' : 'bg-background/50'}`}
+                      onClick={() => setSelectedTaste(selectedTaste === taste ? null : taste)}
+                    >
+                      {taste}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {!hasSearched && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-          {SUBSTITUTIONS_DB.filter(s => s.junk.includes("Biriyani") || s.junk.includes("65") || s.junk.includes("Pizza") || s.junk.includes("Burger")).slice(0, 4).map((item, i) => (
-             <Card key={i} className="cursor-pointer hover:border-primary/50 transition-all hover:bg-primary/5 active:scale-95 group" onClick={() => { setQuery(item.junk); setHasSearched(true); setResults([item]) }}>
-               <CardContent className="p-4 flex items-center justify-between">
-                 <div className="flex flex-col">
-                   <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">{getEmoji(item.junk)} Craving</span>
-                   <span className="font-bold text-sm truncate">{item.junk}</span>
-                 </div>
-                 <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
-               </CardContent>
-             </Card>
-          ))}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-xs font-black uppercase text-muted-foreground tracking-[0.3em] flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              AI Suggestions for {getTimeOfDay()}
+            </h3>
+            {selectedTaste && (
+              <Button variant="ghost" size="sm" onClick={() => setSelectedTaste(null)} className="text-[10px] font-black h-auto py-0 text-primary hover:bg-transparent">Clear Filters</Button>
+            )}
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <AnimatePresence mode="popLayout">
+              {getSmartRecommendations().map((item, i) => (
+                 <motion.div
+                   key={item.junk}
+                   layout
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   exit={{ opacity: 0, scale: 0.9 }}
+                   transition={{ delay: i * 0.05 }}
+                 >
+                   <Card 
+                     className="cursor-pointer hover:border-primary/50 transition-all hover:bg-primary/5 active:scale-95 group border-2 border-primary/5 shadow-lg hover:shadow-primary/10 rounded-3xl overflow-hidden h-full" 
+                     onClick={() => { setQuery(item.junk); setHasSearched(true); setResults([item]) }}
+                   >
+                     <CardContent className="p-6 flex flex-col gap-4">
+                       <div className="flex items-center justify-between">
+                         <div className="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                           {getEmoji(item.junk)}
+                         </div>
+                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                           <ArrowRight className="w-4 h-4 text-primary" />
+                         </div>
+                       </div>
+                       <div className="space-y-2">
+                         <div className="flex flex-wrap gap-1">
+                           {item.tags.filter(t => !['morning', 'afternoon', 'evening', 'night'].includes(t)).slice(0, 2).map(t => (
+                             <span key={t} className="text-[8px] font-black uppercase text-primary/60 tracking-wider bg-primary/5 px-2 py-0.5 rounded-full">{t}</span>
+                           ))}
+                         </div>
+                         <h4 className="font-black text-base leading-tight group-hover:text-primary transition-colors">{item.junk}</h4>
+                       </div>
+                     </CardContent>
+                   </Card>
+                 </motion.div>
+              ))}
+            </AnimatePresence>
+            {getSmartRecommendations().length === 0 && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="col-span-full py-16 text-center bg-muted/10 rounded-[3rem] border-2 border-dashed border-muted-foreground/10">
+                <p className="text-sm font-black text-muted-foreground uppercase tracking-widest">No matching cravings found</p>
+                <p className="text-xs font-bold text-muted-foreground/60 mt-1">Try a different taste or clear filters!</p>
+              </motion.div>
+            )}
+          </div>
         </div>
       )}
 

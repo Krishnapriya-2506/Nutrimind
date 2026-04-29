@@ -43,11 +43,11 @@ export default function Register() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2 text-left">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">Username</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="John Doe"
+                placeholder="e.g. HealthEnthusiast"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required

@@ -1,4 +1,5 @@
-import { useMemo } from "react"
+import { useState, useMemo } from "react"
+import { motion, AnimatePresence } from "motion/react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useUserStats } from "@/contexts/UserStatsContext"
@@ -10,7 +11,14 @@ import {
 } from "lucide-react"
 
 export default function ReportTab() {
-  const { stats } = useUserStats()
+  const { stats, addPoints } = useUserStats()
+  const [rewardClaimed, setRewardClaimed] = useState(false)
+
+  const handleClaimReward = () => {
+    if (rewardClaimed) return
+    addPoints(50)
+    setRewardClaimed(true)
+  }
   
   const aiReport = useMemo(() => {
     try {
@@ -102,7 +110,27 @@ export default function ReportTab() {
           Afternoon: getPerf("Afternoon"),
           Evening: getPerf("Evening")
         },
-        hasData
+        hasData,
+        dailyScores: (() => {
+          const scores = []
+          for (let i = 6; i >= 0; i--) {
+            const d = new Date()
+            d.setDate(d.getDate() - i)
+            const dateStr = d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })
+            const dayLogs = history.filter(log => log.date === dateStr)
+            
+            if (dayLogs.length === 0) {
+              scores.push({ date: d.toLocaleDateString([], { weekday: 'short' }), score: 0 })
+            } else {
+              const healthy = dayLogs.filter(log => !log.cravedItem).length
+              scores.push({ 
+                date: d.toLocaleDateString([], { weekday: 'short' }), 
+                score: Math.round((healthy / dayLogs.length) * 100) 
+              })
+            }
+          }
+          return scores
+        })()
       }
     } catch (e) {
       console.error("AI Report calculation error:", e)
@@ -118,7 +146,8 @@ export default function ReportTab() {
           Afternoon: { label: "Good", color: "text-emerald-500", icon: <CheckCircle2 className="w-4 h-4" /> },
           Evening: { label: "Good", color: "text-emerald-500", icon: <CheckCircle2 className="w-4 h-4" /> }
         },
-        hasData: false
+        hasData: false,
+        dailyScores: []
       }
     }
   }, [stats])
@@ -137,24 +166,27 @@ export default function ReportTab() {
           </div>
         </div>
         
-        <Card className="border-2 border-primary/20 shadow-xl overflow-hidden relative bg-gradient-to-br from-background to-primary/5">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <BrainCircuit className="w-24 h-24" />
-          </div>
-          <CardContent className="p-6 md:p-8">
-            <p className="text-lg md:text-xl font-bold leading-relaxed">
-              “{aiReport.summary}”
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-black px-4 py-1">
-                ✔ {aiReport.healthyCount} Healthy Days
-              </Badge>
-              <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 font-black px-4 py-1">
-                🔥 {stats.currentStreak}-Day Streak
-              </Badge>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="border-2 border-primary/20 shadow-xl overflow-hidden relative backdrop-blur-md bg-background/60">
+            <div className="absolute top-0 right-0 p-4 opacity-5">
+              <BrainCircuit className="w-24 h-24" />
             </div>
-          </CardContent>
-        </Card>
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
+            <CardContent className="p-6 md:p-8 relative z-10">
+              <p className="text-lg md:text-xl font-black leading-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+                “{aiReport.summary}”
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-black px-4 py-1.5 rounded-full">
+                  ✔ {aiReport.healthyCount} Healthy Days
+                </Badge>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 font-black px-4 py-1.5 rounded-full">
+                  🔥 {stats.currentStreak}-Day Streak
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </section>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -305,37 +337,82 @@ export default function ReportTab() {
              <Badge className="bg-emerald-500 font-black">+20% vs Last Week 🎉</Badge>
           </CardHeader>
           <CardContent className="h-48 flex items-end gap-2 px-2 pb-2">
-             {[30, 45, 35, 60, 75, 55, 85].map((h, i) => (
-               <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                 <div className="w-full bg-primary/20 rounded-t-lg relative group transition-all hover:bg-primary/40" style={{ height: `${h}%` }}>
-                   <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">{h}</div>
+             {aiReport.dailyScores.map((day, i) => (
+               <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                 <div className="w-full bg-primary/20 rounded-t-lg relative group transition-all hover:bg-primary/40 flex flex-col justify-end overflow-hidden" style={{ height: `${Math.max(day.score, 5)}%` }}>
+                   <div className="absolute top-1 left-1/2 -translate-x-1/2 text-[9px] font-black text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                     {day.score}%
+                   </div>
+                   {/* Visual indicator for the rate directly on the bar */}
+                   {day.score > 15 && (
+                     <div className="text-[8px] font-black text-white text-center mb-1 opacity-80">
+                       {day.score}%
+                     </div>
+                   )}
+                   <div className={`w-full h-full ${day.score > 70 ? 'bg-emerald-500' : day.score > 40 ? 'bg-amber-500' : 'bg-red-500'} opacity-80`} />
                  </div>
-                 <span className="text-[10px] font-black text-muted-foreground">D{i+1}</span>
+                 <span className="text-[10px] font-black text-muted-foreground">{day.date}</span>
                </div>
              ))}
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-none">
-           <CardHeader>
-             <CardTitle className="text-lg font-black flex items-center gap-2">
-               <Sparkles className="w-5 h-5" />
-               New Badge!
-             </CardTitle>
-           </CardHeader>
-           <CardContent className="text-center py-6">
-             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 shadow-inner ring-4 ring-white/10">
-                🧠
-             </div>
-             <h4 className="text-xl font-black mb-1">Mindful Eater</h4>
-             <p className="text-white/80 text-xs font-bold leading-tight px-4">
-                You've successfully swapped 5+ cravings this week. You're a pro!
-             </p>
-             <Button variant="secondary" className="mt-6 w-full font-black bg-white text-emerald-600 hover:bg-white/90">
-                Claim Reward
-             </Button>
-           </CardContent>
-        </Card>
+        <motion.div whileHover={{ scale: 1.02 }} className="h-full">
+          <Card className={`shadow-xl text-white border-none h-full relative overflow-hidden transition-all duration-500 ${rewardClaimed ? 'bg-emerald-500/50' : 'bg-gradient-to-br from-emerald-500 via-teal-600 to-emerald-700'}`}>
+             <AnimatePresence mode="wait">
+               {!rewardClaimed ? (
+                 <motion.div 
+                   key="reward-available"
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0, scale: 0.9 }}
+                   className="h-full"
+                 >
+                   <CardHeader>
+                     <CardTitle className="text-lg font-black flex items-center gap-2">
+                       <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
+                       New Badge Available!
+                     </CardTitle>
+                   </CardHeader>
+                   <CardContent className="text-center py-6 flex flex-col h-[calc(100%-80px)] justify-between">
+                     <div>
+                       <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 shadow-inner ring-4 ring-white/10 animate-bounce">
+                          🧠
+                       </div>
+                       <h4 className="text-xl font-black mb-1">Mindful Eater</h4>
+                       <p className="text-white/80 text-xs font-bold leading-tight px-4">
+                          You've successfully swapped 5+ cravings this week. You're a pro!
+                       </p>
+                     </div>
+                     <Button 
+                       variant="secondary" 
+                       className="mt-6 w-full font-black bg-white text-emerald-600 hover:bg-emerald-50 hover:scale-[1.02] transition-all shadow-lg py-4 text-base"
+                       onClick={handleClaimReward}
+                     >
+                        Claim +50 Points
+                     </Button>
+                   </CardContent>
+                 </motion.div>
+               ) : (
+                 <motion.div 
+                   key="reward-claimed"
+                   initial={{ opacity: 0, scale: 0.5 }}
+                   animate={{ opacity: 1, scale: 1 }}
+                   className="h-full flex flex-col items-center justify-center p-8 text-center"
+                 >
+                   <div className="w-24 h-24 bg-white/30 rounded-full flex items-center justify-center text-5xl mb-4 shadow-2xl">
+                      🏆
+                   </div>
+                   <h4 className="text-2xl font-black mb-1 text-white">Reward Claimed!</h4>
+                   <p className="text-emerald-50 text-sm font-bold">50 points added to your profile. Great work!</p>
+                   <div className="mt-4 flex gap-1">
+                      {[1,2,3].map(i => <Sparkles key={i} className="w-4 h-4 text-yellow-300" />)}
+                   </div>
+                 </motion.div>
+               )}
+             </AnimatePresence>
+          </Card>
+        </motion.div>
       </section>
 
       {/* Why This Matters */}

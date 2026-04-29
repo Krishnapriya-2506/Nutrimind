@@ -45,7 +45,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex flex-col items-end mr-2 hidden sm:flex">
               <span className="text-sm font-medium text-foreground">
-                Hi, {user.name}
+                Hi, @{user.name}
               </span>
               <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full mt-0.5">
                 {user.goal || "Balanced Diet"}
